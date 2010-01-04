@@ -5,7 +5,7 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dm-is-persistent_state_machine}
-  s.version = "0.0.1"
+  s.version = "0.0.2"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["michael"]
@@ -23,7 +23,9 @@ Gem::Specification.new do |s|
      "README.rdoc",
      "Rakefile",
      "VERSION",
+     "dm-is-persistent_state_machine.gemspec",
      "lib/dm-is-persistent_state_machine.rb",
+     "lib/dm-is-persistent_state_machine/is/persistent_state_machine.rb",
      "test/helper.rb",
      "test/test_dm-is-persistent_state_machine.rb"
   ]
