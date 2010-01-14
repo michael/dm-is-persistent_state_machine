@@ -113,6 +113,7 @@ module DataMapper
         after :save do
           if (@prev_state && @prev_state != state)
             StateChange.create(:from => @prev_state, :to => state, :created_at => DateTime.now)
+            @prev_state = nil # clean up cache
           end
         end
 
