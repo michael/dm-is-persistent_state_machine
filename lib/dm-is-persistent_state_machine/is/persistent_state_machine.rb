@@ -62,8 +62,8 @@ class StateChange
   
   property :id, Serial
   
-  property :from_id, Integer,   :required => true, :min => 1, :unique_index => :type
-  property :to_id, Integer,     :required => true, :min => 1, :unique_index => :type
+  property :from_id, Integer,   :required => true, :min => 1
+  property :to_id, Integer,     :required => true, :min => 1
   
   property :created_at, DateTime
   
