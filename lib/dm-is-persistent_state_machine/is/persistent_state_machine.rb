@@ -15,12 +15,12 @@ end
 class State
   include DataMapper::Resource
 
-  property :id,          Serial
-  property :code,        String, :required => true, :unique => true, :unique_index => true
-  property :name,        String, :required => true, :unique => true, :unique_index => true
-  property :editable,    Boolean
-  property :sorter,      Integer
-  property :type,        Discriminator
+  property :id,             Serial
+  property :code,           String, :required => true, :unique => true, :unique_index => true
+  property :name,           String, :required => true, :unique => true, :unique_index => true
+  property :editable,       Boolean, :default => true
+  property :sorter,         Integer
+  property :type,           Discriminator
 
   # outgoing transitions
   has n, :state_transitions, 'StateTransition', :child_key => [:state_id]
@@ -51,12 +51,26 @@ end
 class StateEvent
   include DataMapper::Resource
   
-  property :id, Serial
+  property :id,   Serial
   property :code, String, :required => true, :unique => true, :unique_index => true
   property :name, String, :required => true, :unique => true, :unique_index => true
   property :type, Discriminator
 end
 
+class StateChange
+  include DataMapper::Resource
+  
+  property :id, Serial
+  
+  property :from_id, Integer,   :required => true, :min => 1, :unique_index => :type
+  property :to_id, Integer,     :required => true, :min => 1, :unique_index => :type
+  
+  property :created_at, DateTime
+  
+  # associations
+  belongs_to :from, "State"
+  belongs_to :to,   "State"
+end
 
 module DataMapper
   module Is
@@ -79,7 +93,8 @@ module DataMapper
       ##
     
       def is_persistent_state_machine
- 
+        DataMapper.logger.info "registering persistent state machine..."
+        
         # Add class-methods
         extend DataMapper::Is::PersistentStateMachine::ClassMethods
         extend Forwardable
@@ -90,31 +105,40 @@ module DataMapper
         property :state_id, Integer, :required => true, :min => 1
         belongs_to :state
         
-        DataMapper.logger.info "registering persistent state machine..."
-        
-        # define delegators
-        def_delegators :@state, :events
-        
         # generate a FooState class that is derived from State        
         state_model = Object.full_const_set(self.to_s+"State", Class.new(State))
         # generate a FooStateEvent class that is derived from StateEvent
         event_model = Object.full_const_set(self.to_s+"StateEvent", Class.new(StateEvent))
+        
+        after :save do
+          if (@prev_state && @prev_state != state)
+            StateChange.create(:from => @prev_state, :to => state, :created_at => DateTime.now)
+          end
+        end
+
+        # define delegators
+        def_delegators :@state, :events        
       end
       
       ##
       # fired after trigger_event! is called on resource
       #
-      def after_trigger_event(event)
-      end
-  
       module ClassMethods
         
       end # ClassMethods
  
       module InstanceMethods
-        def trigger_event!(event_code)
+        def trigger_event!(event_code)          
+          # cache the old value
+          @prev_state = self.state
+
           # delegate to State#trigger!
           self.state.trigger_event!(self, event_code)
+        end
+        
+        # hookable
+        def after_trigger_event(event)
+
         end
       end # InstanceMethods
     end # PersistentStateMachine
