@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dm-is-persistent_state_machine}
-  s.version = "0.0.2"
+  s.version = "0.1.0"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["michael"]
-  s.date = %q{2010-01-04}
+  s.date = %q{2010-01-14}
   s.description = %q{A persistent State Machine for DataMapper}
   s.email = %q{ma@zive.at}
   s.extra_rdoc_files = [
@@ -26,8 +26,10 @@ Gem::Specification.new do |s|
      "dm-is-persistent_state_machine.gemspec",
      "lib/dm-is-persistent_state_machine.rb",
      "lib/dm-is-persistent_state_machine/is/persistent_state_machine.rb",
-     "test/helper.rb",
-     "test/test_dm-is-persistent_state_machine.rb"
+     "spec/dm-is-persistent_state_machine_spec.rb",
+     "spec/rcov.opts",
+     "spec/spec.opts",
+     "spec/spec_helper.rb"
   ]
   s.homepage = %q{http://github.com/michael/dm-is-persistent_state_machine}
   s.rdoc_options = ["--charset=UTF-8"]
@@ -35,8 +37,8 @@ Gem::Specification.new do |s|
   s.rubygems_version = %q{1.3.5}
   s.summary = %q{A persistent State Machine for DataMapper}
   s.test_files = [
-    "test/helper.rb",
-     "test/test_dm-is-persistent_state_machine.rb"
+    "spec/dm-is-persistent_state_machine_spec.rb",
+     "spec/spec_helper.rb"
   ]
 
   if s.respond_to? :specification_version then
