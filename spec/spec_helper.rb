@@ -14,6 +14,13 @@ DataMapper.setup(:default, 'sqlite3::memory:')
  
 # classes/vars for tests
 
+class User
+  include DataMapper::Resource
+  
+  property :id,       Serial
+  property :name,     String
+end
+
 class Project
   include DataMapper::Resource
  

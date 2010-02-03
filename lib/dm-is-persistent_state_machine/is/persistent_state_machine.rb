@@ -64,10 +64,11 @@ class StateChange
   
   property :from_id, Integer,   :required => true, :min => 1
   property :to_id, Integer,     :required => true, :min => 1
-  
+  property :user_id, Integer
   property :created_at, DateTime
   
   # associations
+  belongs_to :user
   belongs_to :from, "State"
   belongs_to :to,   "State"
 end
@@ -112,8 +113,9 @@ module DataMapper
         
         after :save do
           if (@prev_state && @prev_state != state)
-            StateChange.create(:from => @prev_state, :to => state, :created_at => DateTime.now)
+            @state_change = StateChange.create(:from => @prev_state, :to => state, :created_at => DateTime.now, :user => @user)
             @prev_state = nil # clean up cache
+            @user = nil
           end
         end
 
@@ -129,9 +131,10 @@ module DataMapper
       end # ClassMethods
  
       module InstanceMethods
-        def trigger_event!(event_code)          
-          # cache the old value
+        def trigger_event!(event_code, user)
+          # cache prev_state and the user that is triggering the event
           @prev_state = self.state
+          @user = user
 
           # delegate to State#trigger!
           self.state.trigger_event!(self, event_code)

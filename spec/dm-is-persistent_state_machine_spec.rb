@@ -5,6 +5,9 @@ describe DataMapper::Is::PersistentStateMachine do
   before(:all) do
     DataMapper.auto_migrate!
     
+    # create a user
+    john_doe = User.create(:name => "John Doe")
+    
     # add some states
     open = ProjectState.create(:name => "Open", :code => "open")
     reviewed = ProjectState.create(:name => "Reviewed", :code => "reviewed")
@@ -19,8 +22,7 @@ describe DataMapper::Is::PersistentStateMachine do
     reviewed_confirmed = StateTransition.create(:state => reviewed, :target => confirmed, :state_event => confirm_evt)
   end
   
-  describe "with active DM Identity Map" do
-    
+  describe "at least" do
     before :each do
       Project.auto_migrate!
       StateChange.auto_migrate!
@@ -29,13 +31,14 @@ describe DataMapper::Is::PersistentStateMachine do
     it "should log state changes" do
       @project = Project.create(:name => "Operation X", :state => ProjectState.first(:code => "open"))
       @project.state.code.should == "open"
-      @project.trigger_event!('review')
+      @project.trigger_event!('review', User.first)
       Project.first(:name => "Operation X").state.code.should == "open" # not persistent yet
       
       StateChange.count.should == 0
       @project.state.code.should == "reviewed"
       @project.save
       StateChange.count.should == 1
+      StateChange.first.user.name.should == "John Doe"
     end   
   end
 end
