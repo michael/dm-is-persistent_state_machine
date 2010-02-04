@@ -106,7 +106,7 @@ module DataMapper
 
           property :from_id, Integer,   :required => true, :min => 1
           property :to_id, Integer,     :required => true, :min => 1
-          property :user_id, Integer
+          property :user_id, Integer,   :required => true, :min => 1
           property Extlib::Inflection.foreign_key(target_model_name).to_sym, Integer, :required => true, :min => 1
           property :created_at, DateTime
 
