@@ -1,7 +1,6 @@
 require 'spec_helper'
 
 describe DataMapper::Is::PersistentStateMachine do
-  
   before(:all) do
     DataMapper.auto_migrate!
     
@@ -25,7 +24,7 @@ describe DataMapper::Is::PersistentStateMachine do
   describe "at least" do
     before :each do
       Project.auto_migrate!
-      StateChange.auto_migrate!
+      ProjectStateChange.auto_migrate!
     end
     
     it "should log state changes" do
@@ -33,12 +32,13 @@ describe DataMapper::Is::PersistentStateMachine do
       @project.state.code.should == "open"
       @project.trigger_event!('review', User.first)
       Project.first(:name => "Operation X").state.code.should == "open" # not persistent yet
-      
-      StateChange.count.should == 0
+
+      ProjectStateChange.count.should == 0
       @project.state.code.should == "reviewed"
       @project.save
-      StateChange.count.should == 1
-      StateChange.first.user.name.should == "John Doe"
+      ProjectStateChange.count.should == 1
+      ProjectStateChange.first.user.name.should == "John Doe"
+      ProjectStateChange.first.project.should == @project
     end   
   end
 end

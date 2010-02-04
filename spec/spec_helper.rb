@@ -10,6 +10,8 @@ $LOAD_PATH.unshift File.expand_path('../lib', __FILE__)
 
 require 'dm-is-persistent_state_machine'
 
+# DataMapper::Logger.new($stdout, :debug)
+
 DataMapper.setup(:default, 'sqlite3::memory:')
  
 # classes/vars for tests

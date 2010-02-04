@@ -57,22 +57,6 @@ class StateEvent
   property :type, Discriminator
 end
 
-class StateChange
-  include DataMapper::Resource
-  
-  property :id, Serial
-  
-  property :from_id, Integer,   :required => true, :min => 1
-  property :to_id, Integer,     :required => true, :min => 1
-  property :user_id, Integer
-  property :created_at, DateTime
-  
-  # associations
-  belongs_to :user
-  belongs_to :from, "State"
-  belongs_to :to,   "State"
-end
-
 module DataMapper
   module Is
     module PersistentStateMachine
@@ -83,7 +67,7 @@ module DataMapper
       # fired when plugin gets included into Resource
       #
       def self.included(base)
- 
+        
       end
  
       ##
@@ -102,18 +86,44 @@ module DataMapper
         # Add instance-methods
         include DataMapper::Is::PersistentStateMachine::InstanceMethods
         
+        target_model_name = self.name.snake_case
+        
         # target object must have a status associated
         property :state_id, Integer, :required => true, :min => 1
         belongs_to :state
+        
+        has n, Extlib::Inflection.pluralize(target_model_name+"StateChange").to_sym
         
         # generate a FooState class that is derived from State        
         state_model = Object.full_const_set(self.to_s+"State", Class.new(State))
         # generate a FooStateEvent class that is derived from StateEvent
         event_model = Object.full_const_set(self.to_s+"StateEvent", Class.new(StateEvent))
+
+        state_change_model = Class.new do
+          include DataMapper::Resource
+
+          property :id, ::DataMapper::Types::Serial
+
+          property :from_id, Integer,   :required => true, :min => 1
+          property :to_id, Integer,     :required => true, :min => 1
+          property :user_id, Integer
+          property Extlib::Inflection.foreign_key(target_model_name).to_sym, Integer, :required => true, :min => 1
+          property :created_at, DateTime
+
+          # associations
+          belongs_to :user
+          belongs_to :from, "State"
+          belongs_to :to,   "State"
+          belongs_to target_model_name.to_sym
+        end
+        
+        state_change_model = Object.full_const_set(self.to_s+"StateChange",state_change_model)
+        
+        self_cached = self
         
         after :save do
           if (@prev_state && @prev_state != state)
-            @state_change = StateChange.create(:from => @prev_state, :to => state, :created_at => DateTime.now, :user => @user)
+            @state_change = state_change_model.create(:from => @prev_state, :to => state, :created_at => DateTime.now, :user => @user, Extlib::Inflection.foreign_key(target_model_name).to_sym => self.id)
             @prev_state = nil # clean up cache
             @user = nil
           end
