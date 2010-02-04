@@ -36,6 +36,7 @@ describe DataMapper::Is::PersistentStateMachine do
       ProjectStateChange.count.should == 0
       @project.state.code.should == "reviewed"
       @project.save
+      @project.project_state_changes.length.should == 1
       ProjectStateChange.count.should == 1
       ProjectStateChange.first.user.name.should == "John Doe"
       ProjectStateChange.first.project.should == @project
