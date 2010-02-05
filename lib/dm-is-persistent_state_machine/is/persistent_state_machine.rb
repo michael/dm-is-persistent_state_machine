@@ -123,7 +123,7 @@ module DataMapper
         
         after :save do
           if (@prev_state && @prev_state != state)
-            @state_change = state_change_model.create(:from => @prev_state, :to => state, :created_at => DateTime.now, :user => @user, Extlib::Inflection.foreign_key(target_model_name).to_sym => self.id)
+            @state_change = state_change_model.create(:from => @prev_state, :to => state, :created_at => DateTime.now, :user => @updating_user, Extlib::Inflection.foreign_key(target_model_name).to_sym => self.id)
             @prev_state = nil # clean up cache
             @user = nil
           end
@@ -144,7 +144,7 @@ module DataMapper
         def trigger_event!(event_code, user)
           # cache prev_state and the user that is triggering the event
           @prev_state = self.state
-          @user = user
+          @updating_user = user
 
           # delegate to State#trigger!
           self.state.trigger_event!(self, event_code)
