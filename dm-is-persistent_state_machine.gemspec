@@ -5,11 +5,11 @@
 
 Gem::Specification.new do |s|
   s.name = %q{dm-is-persistent_state_machine}
-  s.version = "0.1.6"
+  s.version = "0.1.7"
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["michael"]
-  s.date = %q{2010-02-04}
+  s.date = %q{2010-02-05}
   s.description = %q{A persistent State Machine for DataMapper}
   s.email = %q{ma@zive.at}
   s.extra_rdoc_files = [
