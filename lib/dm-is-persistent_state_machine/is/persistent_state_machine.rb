@@ -92,7 +92,7 @@ module DataMapper
         property :state_id, Integer, :required => true, :min => 1
         belongs_to :state
         
-        has n, Extlib::Inflection.pluralize(target_model_name+"StateChange").snake_case.to_sym
+        has n, Extlib::Inflection.pluralize(target_model_name+"StateChange").snake_case.to_sym, :constraint => :destroy!
         
         # generate a FooState class that is derived from State        
         state_model = Object.full_const_set(self.to_s+"State", Class.new(State))
